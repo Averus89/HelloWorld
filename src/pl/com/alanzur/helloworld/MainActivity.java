@@ -1,12 +1,13 @@
 package pl.com.alanzur.helloworld;
 
-import winterwell.jtwitter.Twitter;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Debug;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -21,26 +22,57 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		//Debug.startMethodTracing("Yamba.Trace");
+		Debug.startMethodTracing("Yamba.Trace");
 		buttonUpdate = (Button) findViewById(R.id.button_send);
 		editStatus = (EditText) findViewById(R.id.edit_status);
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see android.app.Activity#onStop()
 	 */
 	@Override
 	protected void onStop() {
-		//Debug.stopMethodTracing();
+		Debug.stopMethodTracing();
 		super.onStop();
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.activity_main, menu);
+		getMenuInflater().inflate(R.menu.menu, menu);
 		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
+	 */
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		Intent intentUpdate = new Intent(this, UpdaterService.class);
+		Intent intentRefresh = new Intent(this, RefreshService.class);
+		
+		switch (item.getItemId()) {
+		case R.id.item_start_service:
+			startService(intentUpdate);
+			return true;
+		case R.id.item_stop_service:
+			stopService(intentUpdate);
+			return true;
+		case R.id.item_refresh:
+			startService(intentRefresh);
+			return true;
+		case R.id.item_prefs:
+			startActivity(new Intent(this, PrefsActivity.class));
+			return true;
+		default:
+			return false;
+		}
+
+		//return super.onOptionsItemSelected(item);
 	}
 
 	public void onClick(View v) {
@@ -57,9 +89,9 @@ public class MainActivity extends Activity {
 		@Override
 		protected String doInBackground(String... params) {
 			try {
-				Twitter twitter = new Twitter("student", "password");
-				twitter.setAPIRootUrl("http://yamba.marakana.com/api");
-				twitter.setStatus(params[0]);
+				/*Twitter twitter = new Twitter("averus", "");
+				twitter.setAPIRootUrl("http://yamba.marakana.com/api");*/
+				((HelloworldApp)getApplication()).getTwitter().setStatus(params[0]);
 				Log.d(TAG, "Posted");
 				return "Posted: " + params[0];
 			} catch (Exception e) {

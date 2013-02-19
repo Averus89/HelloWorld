@@ -6,5 +6,30 @@
     <string name="status_text">Enter message</string>
     <string name="status_button_text">Send</string>
     <string name="status_update_hint">Please enter your status here</string>
+    <string name="start_service_string">Start Service</string>
+    <string name="stop_service">Stop Service</string>
+    <string name="refresh_status">Refresh</string>
+    <string name="prefs_username">Username</string>
+    <string name="prefs_username_summary">Your Username</string>
+    <string name="prefs_password">Password</string>
+    <string name="prefs_password_summary">Enter your password</string>
+    <string name="prefs_server">Server</string>
+    <string name="prefs_server_summary">Enter Server API address</string>
+    <string name="item_preferences">Preferences</string>
+    <string name="pref_delay">Refresh delay</string>
+    <string name="pref_delay_summary">Type delay in ms</string>
+
+    <string-array name="delayNames">
+        <item>Every Minute</item>
+        <item>Every five minutes</item>
+        <item>Every half hour</item>
+        <item>Every hour</item>
+    </string-array>
+    <string-array name="delayValues">
+        <item>60000</item>
+        <item>300000</item>
+        <item>1800000</item>
+        <item>3600000</item>
+    </string-array>
 
 </resources>
