@@ -28,10 +28,12 @@ public class RefreshService extends IntentService {
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
+		StatusData statusData = ((HelloworldApp)getApplication()).statusData;
 		try {
 			List<Status> timeline = ((HelloworldApp) getApplication())
 					.getTwitter().getPublicTimeline();
 			for (Status status : timeline) {
+				statusData.insert(status);
 				Log.d(TAG,
 						String.format("%s %s", status.user.name, status.text));
 			}

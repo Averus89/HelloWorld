@@ -46,6 +46,7 @@ public class UpdaterService extends Service {
 						List<Status> timeline = ((HelloworldApp) getApplication())
 								.getTwitter().getPublicTimeline();
 						for (Status status : timeline) {
+							((HelloworldApp)getApplication()).statusData.insert(status);
 							Log.d(TAG, String.format("%s %s", status.user.name,
 									status.text));
 						}

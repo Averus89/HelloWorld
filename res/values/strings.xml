@@ -31,5 +31,7 @@
         <item>1800000</item>
         <item>3600000</item>
     </string-array>
+        <string name="timeline_title">Timeline</string>
+        <string name="timeline_content">Nothing to display</string>
 
 </resources>

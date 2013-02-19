@@ -13,6 +13,7 @@ public class HelloworldApp extends Application implements
 
 	private Twitter twitter;
 	SharedPreferences prefs;
+	StatusData statusData;
 
 	/*
 	 * (non-Javadoc)
@@ -24,6 +25,9 @@ public class HelloworldApp extends Application implements
 		super.onCreate();
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		prefs.registerOnSharedPreferenceChangeListener(this);
+		
+		statusData = new StatusData(this);
+		
 		Log.d(TAG, "OnCreate");
 	}
 

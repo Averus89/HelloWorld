@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Debug;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,7 +21,7 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		Debug.startMethodTracing("Yamba.Trace");
+		//Debug.startMethodTracing("Yamba.Trace");
 		buttonUpdate = (Button) findViewById(R.id.button_send);
 		editStatus = (EditText) findViewById(R.id.edit_status);
 
@@ -35,7 +34,7 @@ public class MainActivity extends Activity {
 	 */
 	@Override
 	protected void onStop() {
-		Debug.stopMethodTracing();
+		//Debug.stopMethodTracing();
 		super.onStop();
 	}
 
@@ -67,6 +66,9 @@ public class MainActivity extends Activity {
 			return true;
 		case R.id.item_prefs:
 			startActivity(new Intent(this, PrefsActivity.class));
+			return true;
+		case R.id.item_timeline:
+			startActivity(new Intent(this, TimelineActivity.class));
 			return true;
 		default:
 			return false;
