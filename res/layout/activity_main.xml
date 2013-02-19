@@ -1,7 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     tools:context=".MainActivity" >
 
     <TextView
@@ -14,20 +14,22 @@
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/button_send"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/textView1"
+        android:onClick="onClick"
         android:text="@string/status_button_text" />
 
     <EditText
-        android:id="@+id/editText1"
+        android:id="@+id/edit_status"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/button1"
+        android:layout_below="@+id/button_send"
         android:ems="10"
+        android:hint="@string/status_update_hint"
         android:inputType="textMultiLine" >
 
         <requestFocus />
