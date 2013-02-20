@@ -26,6 +26,7 @@ public class TimelineActivity extends ListActivity {
 	SimpleCursorAdapter adapter;
 	TimelineReciever reciever;
 
+	
 	/*
 	 * (non-Javadoc)
 	 * 

@@ -2,6 +2,9 @@ package pl.com.alanzur.helloworld;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,19 +15,23 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements LocationListener {
 	public static String TAG = "MainActivity";
+	public static final String PROVIDER = LocationManager.GPS_PROVIDER;
 	Button buttonUpdate;
 	EditText editStatus;
+	LocationManager locationManager;
+	Location location;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		//Debug.startMethodTracing("Yamba.Trace");
+		// Debug.startMethodTracing("Yamba.Trace");
 		buttonUpdate = (Button) findViewById(R.id.button_send);
 		editStatus = (EditText) findViewById(R.id.edit_status);
-
+		locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+		location = locationManager.getLastKnownLocation(PROVIDER);
 	}
 
 	/*
@@ -34,8 +41,30 @@ public class MainActivity extends Activity {
 	 */
 	@Override
 	protected void onStop() {
-		//Debug.stopMethodTracing();
+		// Debug.stopMethodTracing();
 		super.onStop();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.app.Activity#onResume()
+	 */
+	@Override
+	protected void onResume() {
+		locationManager.requestLocationUpdates(PROVIDER, 30000, 1000, this);
+		super.onResume();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.app.Activity#onPause()
+	 */
+	@Override
+	protected void onPause() {
+		locationManager.removeUpdates(this);
+		super.onPause();
 	}
 
 	@Override
@@ -53,7 +82,7 @@ public class MainActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		Intent intentUpdate = new Intent(this, UpdaterService.class);
 		Intent intentRefresh = new Intent(this, RefreshService.class);
-		
+
 		switch (item.getItemId()) {
 		case R.id.item_start_service:
 			startService(intentUpdate);
@@ -74,7 +103,7 @@ public class MainActivity extends Activity {
 			return false;
 		}
 
-		//return super.onOptionsItemSelected(item);
+		// return super.onOptionsItemSelected(item);
 	}
 
 	public void onClick(View v) {
@@ -91,9 +120,14 @@ public class MainActivity extends Activity {
 		@Override
 		protected String doInBackground(String... params) {
 			try {
-				/*Twitter twitter = new Twitter("averus", "");
-				twitter.setAPIRootUrl("http://yamba.marakana.com/api");*/
-				((HelloworldApp)getApplication()).getTwitter().setStatus(params[0]);
+				if (location != null) {
+					double longlat[] = { location.getLatitude(),
+							location.getLongitude() };
+					((HelloworldApp) getApplication()).getTwitter()
+							.setMyLocation(longlat);
+				}
+				((HelloworldApp) getApplication()).getTwitter().setStatus(
+						params[0]);
 				Log.d(TAG, "Posted");
 				return "Posted: " + params[0];
 			} catch (Exception e) {
@@ -107,6 +141,32 @@ public class MainActivity extends Activity {
 			Toast.makeText(MainActivity.this, result, Toast.LENGTH_LONG).show();
 			super.onPostExecute(result);
 		}
+
+	}
+
+	// Location listener callbacks
+
+	@Override
+	public void onLocationChanged(Location location) {
+		this.location = location;
+		Log.d(TAG, "onLocationChanged: " + location.toString());
+	}
+
+	@Override
+	public void onProviderDisabled(String provider) {
+		if (MainActivity.PROVIDER.equals(provider))
+			locationManager.removeUpdates(this);
+	}
+
+	@Override
+	public void onProviderEnabled(String provider) {
+		if (MainActivity.PROVIDER.equals(provider))
+			locationManager.requestLocationUpdates(MainActivity.PROVIDER,
+			30000, 1000, this);
+	}
+
+	@Override
+	public void onStatusChanged(String provider, int status, Bundle extras) {
 
 	}
 }

@@ -17,8 +17,8 @@ public class StatusData {
 	public static final String C_CREATED_AT = "created_at";
 	public static final String C_USER = "user_name";
 	public static final String C_TEXT = "status_text";
-	  private static final String[] MAX_CREATED_AT_COLUMNS = { "max("
-		      + StatusData.C_CREATED_AT + ")" };
+	private static final String[] MAX_CREATED_AT_COLUMNS = { "max("
+			+ StatusData.C_CREATED_AT + ")" };
 
 	Context context;
 	DbHelper dbHelper;
@@ -26,7 +26,7 @@ public class StatusData {
 
 	public StatusData(Context context) {
 		this.context = context;
-		dbHelper = new DbHelper();
+		dbHelper = new DbHelper(context);
 	}
 
 	public void insert(Status status) {
@@ -35,28 +35,30 @@ public class StatusData {
 		ContentValues values = new ContentValues();
 		values.put(C_ID, status.id);
 		values.put(C_CREATED_AT, status.createdAt.getTime());
-		values.put(C_USER, status.user.name); 
+		values.put(C_USER, status.user.name);
 		values.put(C_TEXT, status.text);
 
 		// db.insert(TABLE, null, values);
-		db.insertWithOnConflict(TABLE, null, values,
-				SQLiteDatabase.CONFLICT_IGNORE);
+		//db.insertWithOnConflict(TABLE, null, values,
+		//		SQLiteDatabase.CONFLICT_IGNORE);
+		
+		context.getContentResolver().insert(StatusProvider.CONTENT_URI, values);
 	}
-	
-	  public long getLatestStatusCreatedAtTime() {
-		    SQLiteDatabase db = this.dbHelper.getReadableDatabase();
-		    try {
-		      Cursor cursor = db.query(TABLE, MAX_CREATED_AT_COLUMNS, null, null, null,
-		          null, null);
-		      try {
-		        return cursor.moveToNext() ? cursor.getLong(0) : Long.MIN_VALUE;
-		      } finally {
-		        cursor.close();
-		      }
-		    } finally {
-		      db.close();
-		    }
-		  }
+
+	public long getLatestStatusCreatedAtTime() {
+		SQLiteDatabase db = this.dbHelper.getReadableDatabase();
+		try {
+			Cursor cursor = db.query(TABLE, MAX_CREATED_AT_COLUMNS, null, null,
+					null, null, null);
+			try {
+				return cursor.moveToNext() ? cursor.getLong(0) : Long.MIN_VALUE;
+			} finally {
+				cursor.close();
+			}
+		} finally {
+			db.close();
+		}
+	}
 
 	public Cursor query() {
 		db = dbHelper.getReadableDatabase();
@@ -64,28 +66,30 @@ public class StatusData {
 				C_CREATED_AT + " DESC");
 		return cursor;
 	}
-
-	class DbHelper extends SQLiteOpenHelper {
-
-		public DbHelper() {
-			super(context, DB_NAME, null, DB_VERSION);
-		}
-
-		@Override
-		public void onCreate(SQLiteDatabase db) {
-			String sql = String.format("create table %s "
-					+ "(%s int primary key, %s int, %s text, %s text)", TABLE,
-					C_ID, C_CREATED_AT, C_USER, C_TEXT);
-			Log.d(TAG, "Create with SQL: " + sql);
-			db.execSQL(sql);
-		}
-
-		@Override
-		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-			// usually alter table
-			db.execSQL("drop table if exists " + TABLE);
-			onCreate(db);
-		}
-
-	}
 }
+
+class DbHelper extends SQLiteOpenHelper {
+	public static final String TAG = DbHelper.class.getSimpleName();
+
+	public DbHelper(Context context) {
+		super(context, StatusData.DB_NAME, null, StatusData.DB_VERSION);
+	}
+
+	@Override
+	public void onCreate(SQLiteDatabase db) {
+		String sql = String.format("create table %s "
+				+ "(%s int primary key, %s int, %s text, %s text)", StatusData.TABLE,
+				StatusData.C_ID, StatusData.C_CREATED_AT, StatusData.C_USER, StatusData.C_TEXT);
+		Log.d(TAG, "Create with SQL: " + sql);
+		db.execSQL(sql);
+	}
+
+	@Override
+	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		// usually alter table
+		db.execSQL("drop table if exists " + StatusData.TABLE);
+		onCreate(db);
+	}
+
+}
+ 
