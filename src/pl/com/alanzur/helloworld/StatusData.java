@@ -17,6 +17,8 @@ public class StatusData {
 	public static final String C_CREATED_AT = "created_at";
 	public static final String C_USER = "user_name";
 	public static final String C_TEXT = "status_text";
+	  private static final String[] MAX_CREATED_AT_COLUMNS = { "max("
+		      + StatusData.C_CREATED_AT + ")" };
 
 	Context context;
 	DbHelper dbHelper;
@@ -33,13 +35,28 @@ public class StatusData {
 		ContentValues values = new ContentValues();
 		values.put(C_ID, status.id);
 		values.put(C_CREATED_AT, status.createdAt.getTime());
-		values.put(C_USER, status.user.name);
+		values.put(C_USER, status.user.name); 
 		values.put(C_TEXT, status.text);
 
 		// db.insert(TABLE, null, values);
 		db.insertWithOnConflict(TABLE, null, values,
 				SQLiteDatabase.CONFLICT_IGNORE);
 	}
+	
+	  public long getLatestStatusCreatedAtTime() {
+		    SQLiteDatabase db = this.dbHelper.getReadableDatabase();
+		    try {
+		      Cursor cursor = db.query(TABLE, MAX_CREATED_AT_COLUMNS, null, null, null,
+		          null, null);
+		      try {
+		        return cursor.moveToNext() ? cursor.getLong(0) : Long.MIN_VALUE;
+		      } finally {
+		        cursor.close();
+		      }
+		    } finally {
+		      db.close();
+		    }
+		  }
 
 	public Cursor query() {
 		db = dbHelper.getReadableDatabase();

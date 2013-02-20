@@ -20,18 +20,21 @@
     <string name="pref_delay_summary">Type delay in ms</string>
 
     <string-array name="delayNames">
-        <item>Every Minute</item>
-        <item>Every five minutes</item>
-        <item>Every half hour</item>
+        <item>Every 15 minutes</item>
+        <item>Every 30 minutes</item>
         <item>Every hour</item>
+        <item>Every half day</item>
+        <item>Every day</item>
     </string-array>
     <string-array name="delayValues">
-        <item>60000</item>
-        <item>300000</item>
-        <item>1800000</item>
-        <item>3600000</item>
+        <item>900000 </item>
+        <item>1800000 </item>
+        <item>3600000 </item>
+        <item>43200000 </item>
+        <item>86400000 </item>
     </string-array>
-        <string name="timeline_title">Timeline</string>
-        <string name="timeline_content">Nothing to display</string>
+
+    <string name="timeline_title">Timeline</string>
+    <string name="timeline_content">Nothing to display</string>
 
 </resources>

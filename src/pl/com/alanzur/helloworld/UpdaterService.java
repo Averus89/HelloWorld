@@ -1,9 +1,5 @@
 package pl.com.alanzur.helloworld;
 
-import java.util.List;
-
-import winterwell.jtwitter.Twitter.Status;
-import winterwell.jtwitter.TwitterException;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
@@ -43,17 +39,9 @@ public class UpdaterService extends Service {
 			public void run() {
 				try {
 					while (running) {
-						List<Status> timeline = ((HelloworldApp) getApplication())
-								.getTwitter().getPublicTimeline();
-						for (Status status : timeline) {
-							((HelloworldApp)getApplication()).statusData.insert(status);
-							Log.d(TAG, String.format("%s %s", status.user.name,
-									status.text));
-						}
+						((HelloworldApp)getApplication()).pullAndInsert();
 						Thread.sleep(Integer.parseInt(((HelloworldApp)getApplication()).prefs.getString("delay", "30000")));
 					}
-				} catch (TwitterException e) {
-					Log.e(TAG, "Died: ", e);
 				} catch (InterruptedException e) {
 					Log.e(TAG, "Interrupted: ", e);
 				}

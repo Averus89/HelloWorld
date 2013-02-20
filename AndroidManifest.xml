@@ -25,24 +25,32 @@
 
         <service android:name=".UpdaterService" >
         </service>
-        <service android:name=".RefreshService" >
+        
+        <service
+            android:name=".RefreshService"
+            android:permission="pl.com.alanzur.helloworld.REFRESH" >
+            <intent-filter>
+                <action android:name="pl.com.alanzur.helloworld.RefreshService" />
+            </intent-filter>
         </service>
 
         <activity android:name=".PrefsActivity" >
         </activity>
+        
         <activity android:name=".TimelineActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <receiver android:name=".BootReciever" >
+        <receiver android:name=".RefreshAlarmReciever" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="pl.com.alanzur.helloworld.RefreshAlarm"/>
             </intent-filter>
         </receiver>
+        
     </application>
 
 </manifest>
