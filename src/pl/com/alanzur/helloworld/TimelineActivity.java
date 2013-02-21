@@ -1,10 +1,13 @@
 package pl.com.alanzur.helloworld;
 
 import android.app.ListActivity;
+import android.app.LoaderManager.LoaderCallbacks;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.text.format.DateUtils;
@@ -16,33 +19,32 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.SimpleCursorAdapter.ViewBinder;
 import android.widget.TextView;
 
-public class TimelineActivity extends ListActivity {
+public class TimelineActivity extends ListActivity implements
+		LoaderCallbacks<Cursor> {
 	static final String TAG = "TimelinieActivity";
-	static final String[] FROM = { StatusData.C_USER, StatusData.C_TEXT,
-			StatusData.C_CREATED_AT };
+	static final String[] FROM = { StatusProvider.C_USER,
+			StatusProvider.C_TEXT, StatusProvider.C_CREATED_AT };
 	static final int[] TO = { R.id.text_user, R.id.text_text,
 			R.id.text_created_at };
-	Cursor cursor;
+	public static final int STATUS_LOADER = 0;
+
 	SimpleCursorAdapter adapter;
 	TimelineReciever reciever;
 
-	
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see android.app.Activity#onCreate(android.os.Bundle)
 	 */
-	@SuppressWarnings("deprecation")
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		cursor = ((HelloworldApp) getApplication()).statusData.query();
-
-		adapter = new SimpleCursorAdapter(this, R.layout.row, cursor, FROM, TO);
+		adapter = new SimpleCursorAdapter(this, R.layout.row, null, FROM, TO,0);
 		adapter.setViewBinder(VIEW_BINDER);
 
-		setTitle(R.string.timeline_title);
+		getLoaderManager().initLoader(-1, null, this);
 		setListAdapter(adapter);
 	}
 
@@ -54,8 +56,10 @@ public class TimelineActivity extends ListActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if(reciever == null) reciever = new TimelineReciever();
-		registerReceiver(reciever, new IntentFilter(HelloworldApp.ACTION_NEW_STATUS));
+		if (reciever == null)
+			reciever = new TimelineReciever();
+		registerReceiver(reciever, new IntentFilter(
+				HelloworldApp.ACTION_NEW_STATUS));
 	}
 
 	/*
@@ -77,7 +81,7 @@ public class TimelineActivity extends ListActivity {
 				return false;
 
 			long time = cursor.getLong(cursor
-					.getColumnIndex(StatusData.C_CREATED_AT));
+					.getColumnIndex(StatusProvider.C_CREATED_AT));
 			CharSequence relativeTime = DateUtils
 					.getRelativeTimeSpanString(time);
 			((TextView) view).setText(relativeTime);
@@ -129,10 +133,31 @@ public class TimelineActivity extends ListActivity {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			cursor = ((HelloworldApp) getApplication()).statusData.query();
-			adapter.changeCursor(cursor);
-			Log.d(TAG, "TimelineReciever onRecieve with count: "+ intent.getIntExtra("count", 0));
+//			cursor = getContentResolver().query(StatusProvider.CONTENT_URI,
+//					null, null, null, StatusProvider.C_CREATED_AT + " DESC");
+			getLoaderManager().restartLoader(STATUS_LOADER, null, TimelineActivity.this);
+			Log.d(TAG,
+					"TimelineReciever onRecieve with count: "
+							+ intent.getIntExtra("count", 0));
 		}
 
+	}
+
+	//LoaderCallbacks
+	@Override
+	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+		// TODO Auto-generated method stub
+		return new CursorLoader(this, StatusProvider.CONTENT_URI, null, null,
+				null, StatusProvider.C_CREATED_AT + " DESC");
+	}
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+		adapter.swapCursor(cursor);
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> loader) {
+		adapter.swapCursor(null);
 	}
 }

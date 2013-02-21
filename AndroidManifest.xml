@@ -5,14 +5,14 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="8"
+        android:minSdkVersion="11"
         android:targetSdkVersion="13" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:name=".HelloworldApp"
@@ -54,6 +54,11 @@
                 <action android:name="pl.com.alanzur.helloworld.RefreshAlarm" />
             </intent-filter>
         </receiver>
+
+        <provider
+            android:name=".StatusProvider"
+            android:authorities="pl.com.alanzur.helloworld.provider" >
+        </provider>
     </application>
 
 </manifest>

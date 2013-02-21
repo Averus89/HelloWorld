@@ -8,6 +8,7 @@ import android.app.Application;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.database.Cursor;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -20,7 +21,7 @@ public class HelloworldApp extends Application implements
 
 	private Twitter twitter;
 	SharedPreferences prefs;
-	StatusData statusData;
+	StatusProvider statusProvider;
 
 	/*
 	 * (non-Javadoc)
@@ -33,7 +34,7 @@ public class HelloworldApp extends Application implements
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		prefs.registerOnSharedPreferenceChangeListener(this);
 
-		statusData = new StatusData(this);
+		statusProvider = new StatusProvider();
 
 		Log.d(TAG, "OnCreate");
 	}
@@ -52,7 +53,7 @@ public class HelloworldApp extends Application implements
 		}
 		return twitter;
 	}
-	
+
 	static final Intent refreshAlarm = new Intent(ACTION_REFRESH_ALARM);
 
 	@Override
@@ -65,11 +66,17 @@ public class HelloworldApp extends Application implements
 
 	public int pullAndInsert() {
 		int count = 0;
-		long latestStatusCreatedAtTime = statusData.getLatestStatusCreatedAtTime();
+		Cursor c = getContentResolver().query(StatusProvider.CONTENT_URI,
+				StatusProvider.MAX_CREATED_AT_COLUMNS, null, null, null);
+		c.moveToFirst();
+		long latestStatusCreatedAtTime = c.getLong(0);
+		// Cursor cursor = db.query(TABLE, MAX_CREATED_AT_COLUMNS, null, null,
+		// null, null, null);
 		try {
 			List<Status> timeline = getTwitter().getPublicTimeline();
 			for (Status status : timeline) {
-				statusData.insert(status);
+				getContentResolver().insert(StatusProvider.CONTENT_URI,
+						StatusProvider.statusToValues(status));
 				if (status.createdAt.getTime() > latestStatusCreatedAtTime) {
 					count++;
 				}
